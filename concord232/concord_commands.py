@@ -320,11 +320,18 @@ def cmd_zone_data(self, msg):
           'zone_text': '',
           'zone_text_tokens': [ ],
           }
+
+    identifier = 'p' + str(d['partition_number']) + 'z' + str(d['zone_number'])
     if len(msg) > 0x09 + 1:
         d['zone_text'] = decode_text_tokens(msg[9:-1])
         d['zone_text_tokens'] = msg[9:-1]
+    else: 
+        if identifier in self.zones_config:
+            d['zone_text'] = self.zones_config[identifier]
+        else:
+            self.zones_config[identifier] = d['zone_text']
+            self._write_config()
     
-    identifier = 'p' + str(d['partition_number']) + 'z' + str(d['zone_number'])
     self.zones[identifier] = d
     return d;
     

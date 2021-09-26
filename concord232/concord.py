@@ -1,3 +1,7 @@
+try:
+    import ConfigParser as configparser
+except ImportError:
+    import configparser
 from datetime import datetime
 import sys
 import time
@@ -242,7 +246,7 @@ def decode_message_from_ascii(ascii_msg):
 
 
 class AlarmPanelInterface(object):
-    def __init__(self, dev_name, timeout_secs, logger):
+    def __init__(self, dev_name, timeout_secs, logger, configfile):
         self.serial_interface = SerialInterface(dev_name, timeout_secs, \
                                                     self.ctrl_char_cb, logger)
         self.timeout_secs = timeout_secs
@@ -253,6 +257,10 @@ class AlarmPanelInterface(object):
         self.zones  = {}
         self.users = {}
         self.master_pin = '0520'
+
+        self._configfile = configfile
+        self.zones_config = {}
+        self._load_config()
      
         self.display_messages = [];
         # Messages on the transmit queue are in binary format with a
@@ -270,7 +278,33 @@ class AlarmPanelInterface(object):
         for command_code, (command_id, command_name, parser_fn) \
                 in RX_COMMANDS.items():
             self.message_handlers[command_id] = [ ]
-        
+
+    def _load_config(self):
+        self._config = configparser.ConfigParser()
+        self._config.read(self._configfile)
+
+        if not self._config.has_section('config'):
+            self._config.add_section('config')
+
+        if self._config.has_section('zones'):
+            for opt in self._config.options('zones'):
+                number = opt
+                name = self._config.get('zones', opt)
+                self.zones_config[number] = name
+
+    def _write_config(self):
+        if not self._config.has_section('zones'):
+            self._config.add_section('zones')
+
+        for key,value in self.zones_config.items():
+            if (not self._config.has_option('zones', key) and
+                    value != 'Unknown'):
+                self._config.set('zones', key, value)
+        try:
+            with open(self._configfile, 'w') as configfile:
+                self._config.write(configfile)
+        except IOError as ex:
+            LOG.error('Unable to write %s: %s' % (self._configfile, ex))
 
     def register_message_handler(self, command_id, handler_fn):
         """ 

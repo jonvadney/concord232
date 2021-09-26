@@ -63,7 +63,7 @@ def main():
     logging.getLogger('connectionpool').setLevel(logging.WARNING)
 
     if args.serial:
-        ctrl = concord.AlarmPanelInterface(args.serial, 0.25, LOG)
+        ctrl = concord.AlarmPanelInterface(args.serial, 0.25, LOG, args.config)
     else:
         LOG.error('Serial and baudrate are required')
         return
