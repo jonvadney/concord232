@@ -71,6 +71,20 @@ Arm to away without beeps
 $ concord232_client arm-away-silent
 ```
 
+## Config
+A config.ini is generated when new zones are detected without a name provided by the Concord 4 alarm panel.  This file may be used to specify zone names.
+
+```
+[zones]
+p1z1 = Zone 1
+p1z2 = Zone 2
+p1z3 = Zone 3
+p1z4 = Zone 4
+p1z5 = Zone 5
+p1z6 = Zone 6
+p1z7 = Zone 7
+```
+
 ## Home Assistant
 Home Assistant will automatically download and install the pip3 library, but it only utilizes the Client to connect to the server.  I used the instructions [found here](http://www.raspberrypi-spy.co.uk/2015/10/how-to-autorun-a-python-script-on-boot-using-systemd/) for setting up the server to run automatically at boot time.
 

@@ -283,9 +283,6 @@ class AlarmPanelInterface(object):
         self._config = configparser.ConfigParser()
         self._config.read(self._configfile)
 
-        if not self._config.has_section('config'):
-            self._config.add_section('config')
-
         if self._config.has_section('zones'):
             for opt in self._config.options('zones'):
                 number = opt
